@@ -1,11 +1,8 @@
-version: "3.3"
-
 services:
   zbx-proxy:
     image: zabbix/zabbix-proxy-sqlite3:6.4.7-alpine
     container_name: zbx-proxy
     restart: unless-stopped
-    network_mode: host
     environment:
       - ZBX_HOSTNAME=${ZBX_HOSTNAME}
       - ZBX_SERVER_HOST=${ZBX_SERVER_HOST}
