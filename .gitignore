@@ -1,0 +1,6 @@
+data/
+logs/
+.env
+zbx_psk.txt
+*.log
+*.sqlite

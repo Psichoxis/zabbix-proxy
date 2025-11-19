@@ -1,0 +1,34 @@
+version: "3.3"
+
+services:
+  zbx-proxy:
+    image: zabbix/zabbix-proxy-sqlite3:6.4.7-alpine
+    container_name: zbx-proxy
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - ZBX_HOSTNAME=${ZBX_HOSTNAME}
+      - ZBX_SERVER_HOST=${ZBX_SERVER_HOST}
+      - ZBX_SERVER_PORT=${ZBX_SERVER_PORT:-10051}
+      - ZBX_PROXYMODE=${ZBX_PROXYMODE:-0}          # 0=active, 1=passive
+      - ZBX_TLSCONNECT=${ZBX_TLSCONNECT:-psk}
+      - ZBX_TLSACCEPT=${ZBX_TLSACCEPT:-psk}
+      - ZBX_TLSPSKIDENTITY=${ZBX_TLSPSKIDENTITY}
+      - ZBX_TLSPSKFILE=/run/secrets/zbx_psk
+      - ZBX_STARTPOLLERS=${ZBX_STARTPOLLERS:-10}
+      - ZBX_STARTPINGERS=${ZBX_STARTPINGERS:-5}
+      - ZBX_STARTTRAPPERS=${ZBX_STARTTRAPPERS:-5}
+      - ZBX_STARTDISCOVERERS=${ZBX_STARTDISCOVERERS:-5}
+      - ZBX_STARTHTTPPOLLERS=${ZBX_STARTHTTPPOLLERS:-5}
+      - ZBX_STARTSNMPPOLLER=${ZBX_STARTSNMPPOLLER:-5}
+      - ZBX_TIMEOUT=${ZBX_TIMEOUT:-10}
+      - TZ=${TZ:-America/Argentina/Cordoba}
+    volumes:
+      - ./data:/var/lib/zabbix
+      - ./logs:/var/log/zabbix
+    secrets:
+      - zbx_psk
+
+secrets:
+  zbx_psk:
+    file: ./zbx_psk.txt
