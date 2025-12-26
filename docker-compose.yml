@@ -1,6 +1,6 @@
 services:
   zbx-proxy:
-    image: zabbix/zabbix-proxy-sqlite3:6.4.7-alpine
+    image: zabbix/zabbix-proxy-sqlite3:alpine-7.0-latest
     container_name: zbx-proxy
     restart: unless-stopped
     environment:
@@ -23,6 +23,8 @@ services:
     volumes:
       - ./data:/var/lib/zabbix
       - ./logs:/var/log/zabbix
+    ports:
+      - "10051:10051"
     secrets:
       - zbx_psk
 
