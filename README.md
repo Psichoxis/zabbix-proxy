@@ -5,7 +5,7 @@ Deploy rápido de Zabbix Proxy 7.0 usando SQLite3 y Docker.
 ## Uso general ##
 Clonar repositorio:
 ```bash
-git clone https://github.com/lunixsrl/zabbix-proxy.git  && cd zabbix-proxy
+git clone https://github.com/Psichoxis/zabbix-proxy.git  && cd zabbix-proxy
 ```
 
 Ajuste de variables:
