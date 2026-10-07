@@ -1,32 +1,62 @@
 services:
   zbx-proxy:
-    image: zabbix/zabbix-proxy-sqlite3:alpine-7.0-latest
+    image: zabbix/zabbix-proxy-sqlite3:alpine-7.0.31
     container_name: zbx-proxy
     restart: unless-stopped
+
     environment:
-      - ZBX_HOSTNAME=${ZBX_HOSTNAME}
-      - ZBX_SERVER_HOST=${ZBX_SERVER_HOST}
-      - ZBX_SERVER_PORT=${ZBX_SERVER_PORT:-10051}
-      - ZBX_PROXYMODE=${ZBX_PROXYMODE:-0}          # 0=active, 1=passive
-      - ZBX_TLSCONNECT=${ZBX_TLSCONNECT:-psk}
-      - ZBX_TLSACCEPT=${ZBX_TLSACCEPT:-psk}
-      - ZBX_TLSPSKIDENTITY=${ZBX_TLSPSKIDENTITY}
-      - ZBX_TLSPSKFILE=/run/secrets/zbx_psk
-      - ZBX_STARTPOLLERS=${ZBX_STARTPOLLERS:-10}
-      - ZBX_STARTPINGERS=${ZBX_STARTPINGERS:-5}
-      - ZBX_STARTTRAPPERS=${ZBX_STARTTRAPPERS:-5}
-      - ZBX_STARTDISCOVERERS=${ZBX_STARTDISCOVERERS:-5}
-      - ZBX_STARTHTTPPOLLERS=${ZBX_STARTHTTPPOLLERS:-5}
-      - ZBX_STARTSNMPPOLLER=${ZBX_STARTSNMPPOLLER:-5}
-      - ZBX_TIMEOUT=${ZBX_TIMEOUT:-10}
-      - TZ=${TZ:-America/Argentina/Cordoba}
+      # Proxy
+      ZBX_HOSTNAME: ${ZBX_HOSTNAME}
+      ZBX_SERVER_HOST: ${ZBX_SERVER_HOST}
+      ZBX_SERVER_PORT: ${ZBX_SERVER_PORT:-10051}
+      ZBX_PROXYMODE: 0
+
+      # SQLite
+      ZBX_DBNAME: ${ZBX_DBNAME:-zabbix_proxy.sqlite}
+
+      # TLS PSK
+      ZBX_TLSCONNECT: psk
+      ZBX_TLSACCEPT: psk
+      ZBX_TLSPSKIDENTITY: ${ZBX_TLSPSKIDENTITY}
+      ZBX_TLSPSKFILE: /run/secrets/zbx_psk
+
+      # Performance
+      ZBX_STARTPOLLERS: ${ZBX_STARTPOLLERS:-10}
+      ZBX_STARTPINGERS: ${ZBX_STARTPINGERS:-5}
+      ZBX_STARTTRAPPERS: ${ZBX_STARTTRAPPERS:-5}
+      ZBX_STARTDISCOVERERS: ${ZBX_STARTDISCOVERERS:-5}
+      ZBX_STARTHTTPPOLLERS: ${ZBX_STARTHTTPPOLLERS:-5}
+      ZBX_STARTSNMPPOLLERS: ${ZBX_STARTSNMPPOLLERS:-5}
+      ZBX_TIMEOUT: ${ZBX_TIMEOUT:-30}
+
+      # Timezone
+      TZ: ${TZ:-America/Argentina/Cordoba}
+
     volumes:
-      - ./data:/var/lib/zabbix
-      - ./logs:/var/log/zabbix
+      - zbx-db:/var/lib/zabbix/db_data
+
     ports:
       - "10051:10051"
+
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+
+    networks:
+      - zbx-net
+
     secrets:
       - zbx_psk
+
+networks:
+  zbx-net:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1400
+
+volumes:
+  zbx-db:
 
 secrets:
   zbx_psk:
